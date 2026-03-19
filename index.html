@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Mock Interview AI</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080810;font-family:Georgia,'Times New Roman',serif;color:#e8e8f0;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(99,102,241,0.18) 0%,transparent 60%),radial-gradient(ellipse 60% 40% at 80% 100%,rgba(244,114,182,0.08) 0%,transparent 50%)}
+#idle{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px}
+#idle h1{color:#f0f0f8;font-size:clamp(24px,5vw,38px);font-weight:400;letter-spacing:-0.5px;margin-bottom:8px;text-align:center}
+.subtitle{color:#8888aa;font-size:14px;margin-bottom:24px;line-height:1.6;text-align:center;max-width:440px}
+.ios-banner{width:100%;max-width:460px;margin-bottom:18px;padding:12px 14px;background:rgba(251,191,36,0.06);border:1px solid rgba(251,191,36,0.22);border-radius:12px;display:none}
+.banner-inner{display:flex;gap:10px}
+.banner-title{color:#fcd34d;font-size:13px;font-weight:600;margin-bottom:3px}
+.banner-text{color:#aa8840;font-size:12px;line-height:1.6}
+.form-group{width:100%;max-width:460px;margin-bottom:14px}
+.form-group label{display:block;color:#9999bb;font-size:12px;margin-bottom:7px}
+.lang-btns{display:flex;gap:8px}
+.lang-btn{flex:1;padding:10px 12px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;color:#777799;font-size:13px;cursor:pointer;font-family:Georgia,serif;transition:all 0.2s}
+.lang-btn.active{background:rgba(99,102,241,0.22);border-color:rgba(99,102,241,0.55);color:#a5b4fc}
+input[type=text]{width:100%;padding:13px 16px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:#f0f0f8;font-size:14px;outline:none;font-family:Georgia,serif;transition:border-color 0.2s}
+input[type=text]:focus{border-color:rgba(99,102,241,0.6)}
+input[type=text]::placeholder{color:#333355}
+.voice-row{width:100%;max-width:460px;display:flex;align-items:center;justify-content:space-between;padding:11px 14px;margin-bottom:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;display:none}
+.voice-lbl{color:#9999bb;font-size:13px}
+.voice-sub{color:#555577;font-size:11px;margin-left:8px}
+.toggle{width:40px;height:22px;border-radius:11px;cursor:pointer;background:rgba(255,255,255,0.1);position:relative;transition:background 0.2s;flex-shrink:0}
+.toggle.on{background:rgba(99,102,241,0.85)}
+.knob{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s}
+.toggle.on .knob{left:21px}
+.start-btn{width:100%;max-width:460px;padding:14px;background:rgba(99,102,241,0.88);border:none;border-radius:12px;color:#fff;font-size:15px;cursor:pointer;font-family:Georgia,serif;transition:all 0.2s}
+.start-btn:disabled{background:rgba(99,102,241,0.25);cursor:not-allowed}
+.features{margin-top:24px;display:flex;gap:16px;justify-content:center;color:#555577;font-size:11px;flex-wrap:wrap}
+.features span{display:flex;align-items:center;gap:4px}
+.dot{color:#6366f1}
+#chat{display:none;flex-direction:column;height:100vh;position:relative;z-index:1;max-width:700px;margin:0 auto;width:100%}
+.hdr{padding:13px 18px;border-bottom:1px solid rgba(255,255,255,0.07);display:flex;align-items:center;justify-content:space-between;background:rgba(8,8,16,0.92);backdrop-filter:blur(20px);position:sticky;top:0;z-index:10}
+.hdr-left{display:flex;align-items:center;gap:11px}
+.av{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;font-size:15px;transition:box-shadow 0.3s;flex-shrink:0}
+.av.speaking{box-shadow:0 0 0 5px rgba(99,102,241,0.15),0 0 0 10px rgba(99,102,241,0.06)}
+.iname{color:#f0f0f8;font-size:13px;font-weight:600}
+.istatus{color:#6366f1;font-size:11px}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.qcount{color:#444466;font-size:12px}
+.hbtn{padding:4px 10px;font-size:11px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.09);border-radius:7px;color:#777799;cursor:pointer;font-family:Georgia,serif}
+.hbtn.on{background:rgba(99,102,241,0.18);border-color:rgba(99,102,241,0.35);color:#a5b4fc}
+.msgs{flex:1;overflow-y:auto;padding:20px 18px 12px;display:flex;flex-direction:column;gap:16px}
+.mrow{display:flex;gap:10px;align-items:flex-start}
+.mrow.user{flex-direction:row-reverse}
+.mav{width:28px;height:28px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,#6366f1,#a855f7);display:flex;align-items:center;justify-content:center;font-size:12px}
+.bub{max-width:82%;padding:12px 15px;font-size:14px;line-height:1.75}
+.bub.ai{border-radius:4px 16px 16px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:#e8e8f0}
+.bub.user{border-radius:16px 16px 4px 16px;background:linear-gradient(135deg,rgba(99,102,241,0.62),rgba(168,85,247,0.48));color:#e8e8f0}
+.bub.tr{border-radius:16px 16px 4px 16px;background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.28);color:#fca5a5;font-style:italic}
+.fline{margin-bottom:6px;padding:7px 12px;border-radius:0 8px 8px 0;background:rgba(255,255,255,0.04)}
+.playbtn{margin-top:8px;padding:3px 9px;font-size:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;color:#8888aa;cursor:pointer;font-family:Georgia,serif}
+.typing{display:flex;gap:5px;align-items:center;padding:13px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px 16px 16px 16px}
+.dp{width:6px;height:6px;border-radius:50%;background:#6366f1;animation:pulse 1.2s ease-in-out infinite}
+.dp:nth-child(2){animation-delay:0.2s}
+.dp:nth-child(3){animation-delay:0.4s}
+.ibar{padding:12px 18px 20px;background:rgba(8,8,16,0.96);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,0.07)}
+.errbox{margin-bottom:10px;padding:10px 13px;background:rgba(239,68,68,0.09);border:1px solid rgba(239,68,68,0.28);border-radius:10px;display:none}
+.errbox p{color:#fca5a5;font-size:12px;margin-bottom:6px}
+.mgbtn{padding:4px 11px;background:rgba(239,68,68,0.18);border:1px solid rgba(239,68,68,0.35);border-radius:6px;color:#fca5a5;font-size:11px;cursor:pointer;font-family:Georgia,serif}
+.errmsg{color:#f87171;font-size:12px;margin-bottom:8px;text-align:center;display:none}
+.irow{display:flex;gap:8px;align-items:flex-end}
+.micbtn{width:46px;height:46px;border-radius:50%;border:none;flex-shrink:0;background:rgba(99,102,241,0.18);color:#a5b4fc;font-size:19px;cursor:pointer;display:none;align-items:center;justify-content:center;transition:background 0.2s}
+.micbtn.rec{background:rgba(239,68,68,0.82);color:#fff;animation:ring 1.5s ease-out infinite}
+.micbtn:disabled{opacity:0.4;cursor:not-allowed}
+textarea{flex:1;padding:12px 14px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.11);border-radius:12px;color:#f0f0f8;font-size:14px;outline:none;resize:none;font-family:Georgia,serif;line-height:1.6;max-height:120px;overflow:auto}
+textarea.listening{border-color:rgba(239,68,68,0.35)}
+textarea::placeholder{color:#333355}
+.sendbtn{width:46px;height:46px;border:none;border-radius:12px;background:rgba(99,102,241,0.22);color:#fff;font-size:18px;cursor:not-allowed;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sendbtn.active{background:rgba(99,102,241,0.88);cursor:pointer}
+.hint{color:#2d2d50;font-size:11px;margin-top:7px;text-align:center}
+#modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,0.72);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:24px}
+.mbox{background:#13131f;border:1px solid rgba(255,255,255,0.11);border-radius:20px;padding:26px;max-width:370px;width:100%}
+.micon{font-size:34px;text-align:center;margin-bottom:10px}
+.mtitle{color:#f0f0f8;font-size:17px;font-weight:400;text-align:center;margin-bottom:4px}
+.msub{color:#555577;font-size:12px;text-align:center;margin-bottom:18px}
+.steps{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.step{display:flex;gap:11px;align-items:flex-start}
+.snum{width:22px;height:22px;border-radius:50%;flex-shrink:0;background:rgba(99,102,241,0.18);border:1px solid rgba(99,102,241,0.35);display:flex;align-items:center;justify-content:center;color:#a5b4fc;font-size:11px;font-weight:600}
+.stxt{color:#ccccdd;font-size:13px;line-height:1.5;padding-top:2px}
+.mtip{padding:9px 13px;background:rgba(251,191,36,0.07);border:1px solid rgba(251,191,36,0.18);border-radius:9px;margin-bottom:18px}
+.mtip p{color:#fcd34d;font-size:12px;line-height:1.5}
+.mokbtn{width:100%;padding:11px;background:rgba(99,102,241,0.78);border:none;border-radius:11px;color:#fff;font-size:14px;cursor:pointer;font-family:Georgia,serif}
+@keyframes pulse{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+@keyframes ring{0%{box-shadow:0 0 0 0 rgba(239,68,68,0.4)}70%{box-shadow:0 0 0 10px rgba(239,68,68,0)}100%{box-shadow:0 0 0 0 rgba(239,68,68,0)}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.blink{animation:blink 1s infinite}
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(99,102,241,0.3);border-radius:4px}
+</style>
+</head>
+<body>
+
+<div id="idle">
+  <div style="font-size:50px;margin-bottom:14px">&#127897;&#65039;</div>
+  <h1>Mock Interview AI</h1>
+  <p class="subtitle" id="subtitle">Latihan wawancara kerja dengan AI. Jawab pakai suara atau ketik.</p>
+
+  <div class="ios-banner" id="ios-banner">
+    <div class="banner-inner">
+      <span style="font-size:18px;flex-shrink:0">&#127822;</span>
+      <div>
+        <div class="banner-title" id="ios-title">iPhone terdeteksi</div>
+        <div class="banner-text" id="ios-text">Fitur mic mungkin tidak tersedia. Kamu tetap bisa interview dengan mengetik.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label id="llabel">Bahasa Interview</label>
+    <div class="lang-btns">
+      <button class="lang-btn active" id="bid" onclick="setLang('id')">&#127470;&#127465; Bahasa Indonesia</button>
+      <button class="lang-btn" id="ben" onclick="setLang('en')">&#127468;&#127463; English</button>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label id="rlabel">Posisi yang kamu lamar</label>
+    <input type="text" id="jinput" onkeydown="if(event.key==='Enter')startInterview()" oninput="onJobInput()">
+  </div>
+
+  <div class="voice-row" id="vrow">
+    <div class="voice-lbl">&#127908; <span id="vlbl">Mode Suara</span><span class="voice-sub" id="vsub">Jawab pakai mic</span></div>
+    <div class="toggle on" id="tog" onclick="toggleVoice()"><div class="knob"></div></div>
+  </div>
+
+  <button class="start-btn" id="sbtn" onclick="startInterview()" disabled>Mulai Interview &#8594;</button>
+
+  <div class="features">
+    <span><span class="dot">&#10022;</span><span id="f1">5 Pertanyaan</span></span>
+    <span><span class="dot">&#10022;</span><span id="f2">Suara + Teks</span></span>
+    <span><span class="dot">&#10022;</span><span id="f3">Feedback Langsung</span></span>
+    <span><span class="dot">&#10022;</span>Text-to-Speech</span>
+  </div>
+</div>
+
+<div id="chat">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="av" id="av">&#127899;</div>
+      <div>
+        <div class="iname">AI Interviewer</div>
+        <div class="istatus" id="istatus"></div>
+      </div>
+    </div>
+    <div class="hdr-right">
+      <span class="qcount" id="qc">Q 0/5</span>
+      <button class="hbtn on" id="ttsbtn" onclick="toggleTTS()" style="display:none">&#128266; On</button>
+      <button class="hbtn" id="rstbtn" onclick="resetApp()">Ulang</button>
+    </div>
+  </div>
+
+  <div class="msgs" id="msgs"></div>
+
+  <div class="ibar">
+    <div class="errbox" id="denybox">
+      <p id="denytxt">&#128683; Izin mikrofon ditolak</p>
+      <button class="mgbtn" id="mgbtn" onclick="showModal()">Cara aktifkan mikrofon &#8594;</button>
+    </div>
+    <div class="errmsg" id="errmsg"></div>
+    <div class="irow">
+      <button class="micbtn" id="micbtn" onclick="handleMic()">&#127908;</button>
+      <textarea id="ans" rows="1" oninput="onAnsInput(this)" onkeydown="handleKey(event)"></textarea>
+      <button class="sendbtn" id="sendbtn" onclick="sendMessage()">&#8593;</button>
+    </div>
+    <div class="hint" id="hint">Shift+Enter untuk baris baru</div>
+  </div>
+</div>
+
+<div id="modal" onclick="if(event.target===this)closeModal()">
+  <div class="mbox">
+    <div class="micon" id="micon">&#127908;</div>
+    <div class="mtitle" id="mtitle">Aktifkan Mikrofon</div>
+    <div class="msub" id="msub"></div>
+    <div class="steps" id="msteps"></div>
+    <div class="mtip"><p id="mtip">&#128161; Setelah mengubah izin, kembali dan coba lagi.</p></div>
+    <button class="mokbtn" id="mokbtn" onclick="closeModal()">Mengerti</button>
+  </div>
+</div>
+
+<script>
+var PROMPTS = {
+  id: "Kamu adalah pewawancara kerja profesional yang sedang melakukan mock interview.\n1. Tanya SATU pertanyaan interview setiap giliran\n2. Setelah kandidat menjawab, berikan feedback:\n   - Apa yang bagus dari jawaban (tandai dengan checkmark)\n   - Apa yang bisa ditingkatkan (tandai dengan warning)\n   - Contoh jawaban lebih kuat menggunakan metode STAR\n3. Lanjut ke pertanyaan berikutnya\n4. Setelah 5 pertanyaan, berikan penilaian keseluruhan (skor dari 10)\nMulai dengan menyambut kandidat dan ajukan pertanyaan pertama. Nada profesional tapi ramah. Topik: perkenalan diri, kelebihan/kekurangan, kerja tim, problem-solving, motivasi. Gunakan Bahasa Indonesia.",
+  en: "You are a professional job interviewer conducting a mock interview.\n1. Ask ONE interview question at a time\n2. After the user answers, give structured feedback:\n   - What was good (mark with checkmark)\n   - What could be improved (mark with warning)\n   - A sample stronger answer using STAR method\n3. Then ask the next question\n4. After 5 questions, give an overall assessment (score out of 10)\nStart by warmly welcoming the user and asking the first question. Keep tone professional but encouraging. Topics: self-intro, strengths/weaknesses, teamwork, problem-solving, motivation. Always respond in English."
+};
+
+var GUIDES = {
+  android: { icon:"&#129302;", name:"Android", steps:["Buka Pengaturan HP","Ketuk Aplikasi / Apps","Cari browser yang kamu pakai","Ketuk Izin lalu Mikrofon","Pilih Izinkan, lalu kembali"] },
+  ios: { icon:"&#127822;", name:"iPhone / iPad", steps:["Buka Pengaturan iPhone","Scroll ke bawah, cari browser kamu","Aktifkan toggle Mikrofon","Kembali ke browser dan coba lagi"] }
+};
+
+var lang="id", voiceOn=true, ttsOn=true, voiceOK=false, ttsOK=false;
+var isIOS=false, recording=false, speaking=false, busy=false;
+var msgs=[], role="", qnum=0, rec=null, synth=null;
+
+window.addEventListener("DOMContentLoaded", function() {
+  var ua = navigator.userAgent;
+  isIOS = /iPhone|iPad|iPod/i.test(ua);
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SR && !isIOS) voiceOK = true;
+  if (window.speechSynthesis) { synth = window.speechSynthesis; ttsOK = true; }
+  if (isIOS) document.getElementById("ios-banner").style.display = "block";
+  if (voiceOK) {
+    document.getElementById("vrow").style.display = "flex";
+    document.getElementById("micbtn").style.display = "flex";
+  }
+  if (ttsOK) document.getElementById("ttsbtn").style.display = "inline-block";
+  setLang("id");
+});
+
+function setLang(l) {
+  lang = l;
+  var id = l === "id";
+  document.getElementById("bid").className = "lang-btn" + (id ? " active" : "");
+  document.getElementById("ben").className = "lang-btn" + (!id ? " active" : "");
+  document.getElementById("subtitle").textContent = id ? "Latihan wawancara kerja dengan AI. Jawab pakai suara atau ketik." : "Practice job interviews with AI. Answer by voice or text.";
+  document.getElementById("llabel").textContent = id ? "Bahasa Interview" : "Interview Language";
+  document.getElementById("rlabel").textContent = id ? "Posisi yang kamu lamar" : "Position you are applying for";
+  document.getElementById("jinput").placeholder = id ? "contoh: Product Manager, UI Designer..." : "e.g. Product Manager, UI Designer...";
+  document.getElementById("vlbl").textContent = id ? "Mode Suara " : "Voice Mode ";
+  document.getElementById("vsub").textContent = id ? "Jawab pakai mic" : "Answer with mic";
+  document.getElementById("sbtn").textContent = id ? "Mulai Interview \u2192" : "Start Interview \u2192";
+  document.getElementById("f1").textContent = id ? "5 Pertanyaan" : "5 Questions";
+  document.getElementById("f2").textContent = id ? "Suara + Teks" : "Voice + Text";
+  document.getElementById("f3").textContent = id ? "Feedback Langsung" : "Live Feedback";
+  document.getElementById("rstbtn").textContent = id ? "Ulang" : "Restart";
+  document.getElementById("ios-title").textContent = id ? "iPhone terdeteksi" : "iPhone detected";
+  document.getElementById("ios-text").textContent = id ? "Fitur mic mungkin tidak tersedia. Kamu tetap bisa interview dengan mengetik." : "Mic may not be available. You can still interview by typing.";
+  document.getElementById("denytxt").textContent = (id ? "Izin mikrofon ditolak" : "Microphone permission denied");
+  document.getElementById("mgbtn").textContent = id ? "Cara aktifkan mikrofon \u2192" : "How to enable mic \u2192";
+  document.getElementById("mtitle").textContent = id ? "Aktifkan Mikrofon" : "Enable Microphone";
+  document.getElementById("mtip").textContent = id ? "Setelah mengubah izin, kembali dan coba mic lagi." : "After changing permissions, come back and try again.";
+  document.getElementById("mokbtn").textContent = id ? "Mengerti" : "Got it";
+  updateHint();
+}
+
+function onJobInput() {
+  document.getElementById("sbtn").disabled = !document.getElementById("jinput").value.trim();
+}
+
+function toggleVoice() {
+  voiceOn = !voiceOn;
+  document.getElementById("tog").className = "toggle" + (voiceOn ? " on" : "");
+  if (!voiceOn && recording) stopRec();
+}
+
+function toggleTTS() {
+  ttsOn = !ttsOn;
+  if (!ttsOn && speaking) stopSpeak();
+  var b = document.getElementById("ttsbtn");
+  b.textContent = ttsOn ? "\uD83D\uDD0A On" : "\uD83D\uDD07 Off";
+  b.className = "hbtn" + (ttsOn ? " on" : "");
+}
+
+function stripText(t) {
+  return t.replace(/[^\x00-\x7F\u00C0-\u024F\u4E00-\u9FFF\uAC00-\uD7A3]/g, " ").replace(/\*\*(.*?)\*\*/g,"$1").replace(/\*(.*?)\*/g,"$1").trim();
+}
+
+function speak(text) {
+  if (!synth || !ttsOn) return;
+  synth.cancel();
+  var utt = new SpeechSynthesisUtterance(stripText(text));
+  utt.lang = lang === "en" ? "en-US" : "id-ID";
+  utt.rate = 0.95;
+  var voices = synth.getVoices();
+  var pref = voices.find(function(v){ return v.lang.startsWith(lang==="en"?"en":"id"); }) || voices[0];
+  if (pref) utt.voice = pref;
+  utt.onstart = function(){ speaking=true; document.getElementById("av").className="av speaking"; setStatus(lang==="id"?"Sedang berbicara...":"Speaking..."); };
+  utt.onend = utt.onerror = function(){ speaking=false; document.getElementById("av").className="av"; setStatus(role); };
+  synth.speak(utt);
+}
+
+function stopSpeak() {
+  if (synth) synth.cancel();
+  speaking = false;
+  document.getElementById("av").className = "av";
+  setStatus(role);
+}
+
+function handleMic() {
+  if (recording) {
+    stopRec();
+    setTimeout(function(){
+      if (document.getElementById("ans").value.trim()) sendMessage();
+    }, 400);
+  } else {
+    stopSpeak();
+    startRec();
+  }
+}
+
+function startRec() {
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  clearErr();
+  rec = new SR();
+  rec.lang = lang === "en" ? "en-US" : "id-ID";
+  rec.continuous = false;
+  rec.interimResults = true;
+  rec.onstart = function(){
+    recording = true;
+    document.getElementById("micbtn").className = "micbtn rec";
+    document.getElementById("micbtn").innerHTML = "&#9209;";
+    document.getElementById("ans").className = "listening";
+    document.getElementById("ans").placeholder = lang==="id" ? "Mendengarkan..." : "Listening...";
+    updateHint();
+    showTrBubble();
+  };
+  rec.onresult = function(e){
+    var interim="", final="";
+    for (var i=e.resultIndex; i<e.results.length; i++){
+      if (e.results[i].isFinal) final += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    updateTrBubble(final||interim);
+    if (final){ document.getElementById("ans").value=final; updateSendBtn(); }
+  };
+  rec.onerror = function(e){
+    stopRecUI(); removeTrBubble();
+    if (e.error==="not-allowed") showDeny();
+    else showErr(lang==="id"?"Tidak ada suara. Coba lagi.":"No speech detected. Try again.");
+  };
+  rec.onend = function(){ stopRecUI(); removeTrBubble(); };
+  rec.start();
+}
+
+function stopRec(){ if(rec) rec.stop(); stopRecUI(); }
+function stopRecUI(){
+  recording = false;
+  document.getElementById("micbtn").className = "micbtn";
+  document.getElementById("micbtn").innerHTML = "&#127908;";
+  document.getElementById("ans").className = "";
+  document.getElementById("ans").placeholder = lang==="id" ? "Ketik jawabanmu..." : "Type your answer...";
+  updateHint();
+}
+
+function showTrBubble(){
+  removeTrBubble();
+  var row=document.createElement("div"); row.className="mrow user"; row.id="trrow";
+  var b=document.createElement("div"); b.className="bub tr"; b.id="trbub";
+  b.innerHTML='<span class="blink">|</span>';
+  row.appendChild(b); document.getElementById("msgs").appendChild(row); scrollBot();
+}
+function updateTrBubble(t){
+  var b=document.getElementById("trbub");
+  if(b) b.textContent=t;
+  scrollBot();
+}
+function removeTrBubble(){ var r=document.getElementById("trrow"); if(r) r.remove(); }
+
+async function callAI(messages, system) {
+  // Calls our Netlify function — API key stays hidden on the server
+  var res = await fetch("/.netlify/functions/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ system: system, messages: messages })
+  });
+  var data = await res.json();
+  return (data.content||[]).map(function(b){ return b.text||""; }).join("");
+}
+
+async function startInterview() {
+  var job = document.getElementById("jinput").value.trim();
+  if (!job) return;
+  role = job;
+  document.getElementById("idle").style.display = "none";
+  document.getElementById("chat").style.display = "flex";
+  setStatus(role);
+  msgs=[]; qnum=0;
+  var system = PROMPTS[lang] + "\n\nThe candidate is applying for: " + job;
+  showTyping();
+  try {
+    var reply = await callAI([{role:"user",content:lang==="en"?"Start the interview":"Mulai interview"}], system);
+    hideTyping();
+    msgs.push({role:"assistant",content:reply});
+    addAI(reply);
+    qnum=1; updateQ();
+    if (ttsOK && ttsOn) speak(reply);
+  } catch(e) {
+    hideTyping();
+    addAI(lang==="id"?"Gagal memulai. Coba lagi.":"Failed to start. Try again.");
+  }
+}
+
+async function sendMessage() {
+  var el=document.getElementById("ans");
+  var userMsg=el.value.trim();
+  if (!userMsg||busy) return;
+  el.value=""; el.style.height="auto"; updateSendBtn();
+  removeTrBubble();
+  addUser(userMsg);
+  msgs.push({role:"user",content:userMsg});
+  busy=true;
+  var system = PROMPTS[lang] + "\n\nThe candidate is applying for: " + role;
+  showTyping();
+  try {
+    var reply = await callAI(msgs, system);
+    hideTyping();
+    msgs.push({role:"assistant",content:reply});
+    addAI(reply);
+    qnum++; updateQ();
+    if (ttsOK && ttsOn) speak(reply);
+  } catch(e) {
+    hideTyping();
+    addAI(lang==="id"?"Error. Coba lagi.":"Error. Please try again.");
+  }
+  busy=false; updateSendBtn();
+}
+
+function addUser(text){
+  var row=document.createElement("div"); row.className="mrow user";
+  var b=document.createElement("div"); b.className="bub user"; b.textContent=text;
+  row.appendChild(b); document.getElementById("msgs").appendChild(row); scrollBot();
+}
+
+function addAI(text){
+  document.querySelectorAll(".playbtn").forEach(function(b){b.remove();});
+  var row=document.createElement("div"); row.className="mrow";
+  var av=document.createElement("div"); av.className="mav"; av.innerHTML="&#127899;";
+  var b=document.createElement("div"); b.className="bub ai";
+  b.innerHTML=fmtMsg(text);
+  if (ttsOK){
+    var pb=document.createElement("button"); pb.className="playbtn";
+    pb.textContent=lang==="id"?"\uD83D\uDD0A Putar ulang":"\uD83D\uDD0A Play again";
+    var cap=text;
+    pb.onclick=function(){
+      if(speaking){stopSpeak();pb.textContent=lang==="id"?"\uD83D\uDD0A Putar ulang":"\uD83D\uDD0A Play again";}
+      else{speak(cap);pb.textContent="\u23F9 Stop";}
+    };
+    b.appendChild(pb);
+  }
+  row.appendChild(av); row.appendChild(b);
+  document.getElementById("msgs").appendChild(row); scrollBot();
+}
+
+function fmtMsg(text){
+  return text.split("\n").map(function(line){
+    if(/^(OK|ok|\u2705|&#9989;|&#10003;|Bagus|Good|\+)/.test(line)) return '<div class="fline" style="border-left:3px solid #4ade80">'+esc(line)+'</div>';
+    if(/^(\u26A0|&#9888;|Perlu|Could|Improve|\-)/.test(line)) return '<div class="fline" style="border-left:3px solid #fbbf24">'+esc(line)+'</div>';
+    if(/^(\uD83D\uDCA1|&#128161;|Contoh|Sample|STAR)/.test(line)) return '<div class="fline" style="border-left:3px solid #60a5fa">'+esc(line)+'</div>';
+    if(line.trim()==="") return "<br>";
+    return '<p style="margin:4px 0">'+esc(line)+"</p>";
+  }).join("");
+}
+
+function esc(s){ return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+function showTyping(){
+  var row=document.createElement("div"); row.className="mrow"; row.id="typrow";
+  var av=document.createElement("div"); av.className="mav"; av.innerHTML="&#127899;";
+  var t=document.createElement("div"); t.className="typing";
+  for(var i=0;i<3;i++){var d=document.createElement("div");d.className="dp";t.appendChild(d);}
+  row.appendChild(av); row.appendChild(t);
+  document.getElementById("msgs").appendChild(row); scrollBot();
+}
+function hideTyping(){ var r=document.getElementById("typrow"); if(r) r.remove(); }
+
+function setStatus(t){ document.getElementById("istatus").textContent=t; }
+function updateQ(){ document.getElementById("qc").textContent="Q "+Math.min(qnum,5)+"/5"; }
+function scrollBot(){ var m=document.getElementById("msgs"); m.scrollTop=m.scrollHeight; }
+
+function onAnsInput(el){
+  el.style.height="auto";
+  el.style.height=Math.min(el.scrollHeight,120)+"px";
+  updateSendBtn();
+}
+function updateSendBtn(){
+  var v=document.getElementById("ans").value.trim();
+  document.getElementById("sendbtn").className="sendbtn"+(v&&!busy?" active":"");
+}
+function handleKey(e){ if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();sendMessage();} }
+function updateHint(){
+  var id=lang==="id";
+  document.getElementById("hint").textContent=recording
+    ?(id?"Merekam - tekan Stop untuk kirim":"Recording - tap Stop to send")
+    :(voiceOK?(id?"Tekan mic untuk mulai - Shift+Enter baris baru":"Tap mic to speak - Shift+Enter new line")
+             :(id?"Shift+Enter untuk baris baru":"Shift+Enter for new line"));
+}
+function clearErr(){
+  document.getElementById("denybox").style.display="none";
+  document.getElementById("errmsg").style.display="none";
+}
+function showDeny(){ document.getElementById("denybox").style.display="block"; }
+function showErr(msg){ var e=document.getElementById("errmsg"); e.textContent=msg; e.style.display="block"; }
+
+function resetApp(){
+  stopSpeak(); stopRec();
+  document.getElementById("chat").style.display="none";
+  document.getElementById("idle").style.display="flex";
+  document.getElementById("msgs").innerHTML="";
+  document.getElementById("ans").value="";
+  document.getElementById("jinput").value="";
+  clearErr();
+  msgs=[]; role=""; qnum=0; busy=false;
+  onJobInput(); setLang("id");
+}
+
+function showModal(){
+  var g=/iPhone|iPad|iPod/i.test(navigator.userAgent)?GUIDES.ios:GUIDES.android;
+  document.getElementById("micon").innerHTML=g.icon;
+  document.getElementById("msub").textContent=g.name;
+  document.getElementById("msteps").innerHTML=g.steps.map(function(s,i){
+    return '<div class="step"><div class="snum">'+(i+1)+'</div><div class="stxt">'+s+'</div></div>';
+  }).join("");
+  document.getElementById("modal").style.display="flex";
+}
+function closeModal(){ document.getElementById("modal").style.display="none"; }
+</script>
+</body>
+</html>
